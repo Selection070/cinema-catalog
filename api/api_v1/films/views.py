@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from random import randint
+
 from annotated_types import (
     MinLen,
     MaxLen,
@@ -39,13 +41,12 @@ async def get_film(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_film(
-    film_id: Annotated[int, Form()],
     title: Annotated[str, MinLen(min_length=3), MaxLen(max_length=20), Form()],
     description: Annotated[str, MaxLen(max_length=200), Form()],
     author: Annotated[str, MinLen(min_length=3), MaxLen(max_length=30), Form()],
 ) -> Film:
     return Film(
-        id=film_id,
+        id=randint(2, 1000),
         title=title,
         description=description,
         author=author,
