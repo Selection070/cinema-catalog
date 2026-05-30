@@ -37,7 +37,7 @@ class FilmCreate(FilmBase):
     author: Annotated[
         str,
         MinLen(min_length=3),
-        MaxLen(max_length=30),
+        MaxLen(max_length=50),
     ]
 
 

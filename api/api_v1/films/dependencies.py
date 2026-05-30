@@ -1,15 +1,12 @@
 from fastapi import HTTPException
 from starlette import status
 
-from api.api_v1.films.crud import FILMS_LIST
+from api.api_v1.films.crud import storage
 from schemas.films import Film
 
 
 async def get_film_by_slug(slug: str) -> Film:
-    film: Film | None = next(
-        (film for film in FILMS_LIST if film.slug == slug),
-        None,
-    )
+    film: Film | None = storage.get_film_by_slug(slug)
     if film:
         return film
 

@@ -8,7 +8,7 @@ from fastapi import (
 
 from api.api_v1.films.dependencies import get_film_by_slug
 
-from api.api_v1.films.crud import FILMS_LIST
+from api.api_v1.films.crud import storage
 
 from schemas.films import (
     Film,
@@ -23,7 +23,7 @@ router = APIRouter(
 
 @router.get("/")
 async def get_films():
-    return {"films": FILMS_LIST}
+    return {"films": storage.get()}
 
 
 @router.get("/{slug}")
@@ -37,9 +37,7 @@ async def get_film(
     "/",
     status_code=status.HTTP_201_CREATED,
 )
-async def create_film(
+async def create(
     new_film: FilmCreate,
 ) -> Film:
-    return Film(
-        **new_film.model_dump(),
-    )
+    return storage.create_film(new_film)
