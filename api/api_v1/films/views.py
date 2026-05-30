@@ -2,21 +2,16 @@ from typing import Annotated
 
 from random import randint
 
-from annotated_types import (
-    MinLen,
-    MaxLen,
-)
 
 from fastapi import (
     Depends,
     APIRouter,
-    Form,
     status,
 )
 
 from api.api_v1.films.dependencies import get_film_by_id
 from api.api_v1.films.crud import FILMS_LIST
-from schemas.films import Film
+from schemas.films import Film, FilmCreate
 
 router = APIRouter(
     prefix="/films",
@@ -41,13 +36,9 @@ async def get_film(
     status_code=status.HTTP_201_CREATED,
 )
 async def create_film(
-    title: Annotated[str, MinLen(min_length=3), MaxLen(max_length=20), Form()],
-    description: Annotated[str, MaxLen(max_length=200), Form()],
-    author: Annotated[str, MinLen(min_length=3), MaxLen(max_length=30), Form()],
+    new_film: FilmCreate,
 ) -> Film:
     return Film(
         id=randint(2, 1000),
-        title=title,
-        description=description,
-        author=author,
+        **new_film.model_dump(),
     )
