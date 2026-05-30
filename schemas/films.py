@@ -1,4 +1,5 @@
 from typing import Annotated
+from webbrowser import MacOSXOSAScript
 
 from annotated_types import (
     MinLen,
@@ -12,13 +13,18 @@ from pydantic import (
 
 
 class FilmBase(BaseModel):
-    id: int = Field(...)
+    slug: str
     title: str
     description: str
     author: str
 
 
-class FilmCreate(BaseModel):
+class FilmCreate(FilmBase):
+    slug: Annotated[
+        str,
+        MinLen(min_length=3),
+        MaxLen(max_length=20),
+    ]
     title: Annotated[
         str,
         MinLen(min_length=3),
