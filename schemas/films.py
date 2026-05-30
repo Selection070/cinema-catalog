@@ -22,7 +22,7 @@ class FilmBase(BaseModel):
 class FilmCreate(FilmBase):
     slug: Annotated[
         str,
-        MinLen(min_length=3),
+        MinLen(min_length=2),
         MaxLen(max_length=20),
     ]
     title: Annotated[
