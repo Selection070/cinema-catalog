@@ -10,6 +10,7 @@ from api.api_v1.films.crud import storage
 from api.api_v1.films.dependencies import get_film_by_slug
 from schemas.films import (
     Film,
+    FilmOut,
     FilmUpdate,
     FilmUpdatePartial,
 )
@@ -36,14 +37,20 @@ FilmBySlug = Annotated[
 ]
 
 
-@router.get("/")
+@router.get(
+    "/",
+    response_model=FilmOut,
+)
 async def get_film(
     film: FilmBySlug,
 ):
     return film
 
 
-@router.put("/")
+@router.put(
+    "/",
+    response_model=FilmOut,
+)
 async def update_film(
     film: FilmBySlug,
     film_in: FilmUpdate,
@@ -56,7 +63,7 @@ async def update_film(
 
 @router.patch(
     "/",
-    response_model=Film,
+    response_model=FilmOut,
 )
 async def update_partial(
     film: FilmBySlug,

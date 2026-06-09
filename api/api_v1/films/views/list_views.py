@@ -7,6 +7,7 @@ from api.api_v1.films.crud import storage
 
 from schemas.films import (
     Film,
+    FilmOut,
     FilmCreate,
 )
 
@@ -16,14 +17,21 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def get_films():
+@router.get(
+    "/",
+    response_model=dict[
+        str,
+        list[FilmOut],
+    ],
+)
+async def get_films() -> dict[str, list[Film]]:
     return {"films": storage.get()}
 
 
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
+    response_model=FilmOut,
 )
 async def create(
     new_film: FilmCreate,

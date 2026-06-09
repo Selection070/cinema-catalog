@@ -57,9 +57,16 @@ class FilmUpdatePartial(FilmBase):
     author: AuthroString | None = None
 
 
+class FilmOut(FilmBase):
+    """
+    Read film model
+    """
+
+
 class Film(FilmBase):
     """
     Film model
     """
 
     slug: str
+    notes: str
