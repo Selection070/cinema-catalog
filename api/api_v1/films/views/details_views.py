@@ -44,7 +44,7 @@ async def get_film(
 
 @router.put("/")
 async def update_film(
-    film: Film,
+    film: FilmBySlug,
     film_in: FilmUpdate,
 ) -> Film:
     return storage.update(
