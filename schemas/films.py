@@ -1,5 +1,4 @@
 from typing import Annotated
-from webbrowser import MacOSXOSAScript
 
 from annotated_types import (
     MinLen,
@@ -10,6 +9,23 @@ from pydantic import (
     BaseModel,
     Field,
 )
+
+TitleString = Annotated[
+    str,
+    MinLen(min_length=3),
+    MaxLen(max_length=20),
+]
+
+DescriptionString = Annotated[
+    str,
+    MaxLen(max_length=200),
+]
+
+AuthroString = Annotated[
+    str,
+    MinLen(min_length=3),
+    MaxLen(max_length=50),
+]
 
 
 class FilmBase(BaseModel):
@@ -24,37 +40,21 @@ class FilmCreate(FilmBase):
         MinLen(min_length=2),
         MaxLen(max_length=20),
     ]
-    title: Annotated[
-        str,
-        MinLen(min_length=3),
-        MaxLen(max_length=20),
-    ]
-    description: Annotated[
-        str,
-        MaxLen(max_length=200),
-    ]
-    author: Annotated[
-        str,
-        MinLen(min_length=3),
-        MaxLen(max_length=50),
-    ]
+    title: TitleString
+    description: DescriptionString
+    author: AuthroString
 
 
 class FilmUpdate(FilmBase):
-    title: Annotated[
-        str,
-        MinLen(min_length=3),
-        MaxLen(max_length=20),
-    ]
-    description: Annotated[
-        str,
-        MaxLen(max_length=200),
-    ]
-    author: Annotated[
-        str,
-        MinLen(min_length=3),
-        MaxLen(max_length=50),
-    ]
+    title: TitleString
+    description: DescriptionString
+    author: AuthroString
+
+
+class FilmUpdatePartial(FilmBase):
+    title: TitleString | None = None
+    description: DescriptionString | None = None
+    author: AuthroString | None = None
 
 
 class Film(FilmBase):

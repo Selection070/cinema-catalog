@@ -11,6 +11,7 @@ from api.api_v1.films.dependencies import get_film_by_slug
 from schemas.films import (
     Film,
     FilmUpdate,
+    FilmUpdatePartial,
 )
 
 router = APIRouter(
@@ -51,6 +52,17 @@ async def update_film(
         film=film,
         film_in=film_in,
     )
+
+
+@router.patch(
+    "/",
+    response_model=Film,
+)
+async def update_partial(
+    film: FilmBySlug,
+    film_in: FilmUpdatePartial,
+) -> Film:
+    return storage.update_partial(film=film, film_in=film_in)
 
 
 @router.delete(
