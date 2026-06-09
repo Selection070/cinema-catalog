@@ -1,10 +1,17 @@
 from typing import Annotated
 
-from fastapi import Depends, status, APIRouter
+from fastapi import (
+    Depends,
+    status,
+    APIRouter,
+)
 
 from api.api_v1.films.crud import storage
 from api.api_v1.films.dependencies import get_film_by_slug
-from schemas.films import Film
+from schemas.films import (
+    Film,
+    FilmUpdate,
+)
 
 router = APIRouter(
     prefix="/slug",
@@ -22,22 +29,35 @@ router = APIRouter(
     },
 )
 
+FilmBySlug = Annotated[
+    Film,
+    Depends(get_film_by_slug),
+]
 
-@router.get("/{slug}")
+
+@router.get("/")
 async def get_film(
-    film: Annotated[Film, Depends(get_film_by_slug)],
+    film: FilmBySlug,
 ):
     return film
 
 
+@router.put("/")
+async def update_film(
+    film: Film,
+    film_in: FilmUpdate,
+) -> Film:
+    return storage.update(
+        film=film,
+        film_in=film_in,
+    )
+
+
 @router.delete(
-    "/{slug}",
+    "/",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete(
-    film: Annotated[
-        Film,
-        Depends(get_film_by_slug),
-    ],
+    film: FilmBySlug,
 ) -> None:
     storage.delete(film=film)
