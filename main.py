@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import (
     FastAPI,
     Request,
@@ -5,6 +7,15 @@ from fastapi import (
 
 from api.api_v1 import router as api_v1_router
 
+from core.config import (
+    LOG_FORMAT,
+    LOG_LVL,
+)
+
+logging.basicConfig(
+    level=LOG_LVL,
+    format=LOG_FORMAT,
+)
 app = FastAPI()
 
 app.include_router(api_v1_router)
