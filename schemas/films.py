@@ -5,10 +5,7 @@ from annotated_types import (
     MaxLen,
 )
 
-from pydantic import (
-    BaseModel,
-    Field,
-)
+from pydantic import BaseModel
 
 TitleString = Annotated[
     str,
@@ -21,7 +18,7 @@ DescriptionString = Annotated[
     MaxLen(max_length=200),
 ]
 
-AuthroString = Annotated[
+AuthorString = Annotated[
     str,
     MinLen(min_length=3),
     MaxLen(max_length=50),
@@ -42,19 +39,19 @@ class FilmCreate(FilmBase):
     ]
     title: TitleString
     description: DescriptionString
-    author: AuthroString
+    author: AuthorString
 
 
 class FilmUpdate(FilmBase):
     title: TitleString
     description: DescriptionString
-    author: AuthroString
+    author: AuthorString
 
 
 class FilmUpdatePartial(FilmBase):
     title: TitleString | None = None
     description: DescriptionString | None = None
-    author: AuthroString | None = None
+    author: AuthorString | None = None
 
 
 class FilmOut(FilmBase):
@@ -69,4 +66,4 @@ class Film(FilmBase):
     """
 
     slug: str
-    notes: str
+    notes: str = ""
