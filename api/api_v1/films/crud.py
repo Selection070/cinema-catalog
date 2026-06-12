@@ -31,6 +31,18 @@ class FilmStorage(BaseModel):
             return FilmStorage()
         return cls.model_validate_json(FILMS_STORAGE_FILEPATH.read_text())
 
+    def initial_from_storage(self) -> None:
+        try:
+            data = FilmStorage.from_state()
+        except ValidationError:
+            self.save_state()
+            log.warning("Recovered short urls storage file due to validation error.")
+
+        self.slug_to_films.update(
+            data.slug_to_films,
+        )
+        log.warning("Recovered data from storage")
+
     def get(self) -> list[Film]:
         return list(self.slug_to_films.values())
 
@@ -70,11 +82,3 @@ class FilmStorage(BaseModel):
 
 
 storage = FilmStorage()
-
-try:
-    storage = FilmStorage.from_state()
-    log.warning("Recovered short urls storage.")
-except ValidationError:
-    storage = FilmStorage()
-    storage.save_state()
-    log.warning("Rewritten short urls storage file due to validation error.")

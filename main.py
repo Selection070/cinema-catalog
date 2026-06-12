@@ -6,6 +6,7 @@ from fastapi import (
 )
 
 from api.api_v1 import router as api_v1_router
+from api.app_lifespan import lifespan
 
 from core.config import (
     LOG_FORMAT,
@@ -16,7 +17,10 @@ logging.basicConfig(
     level=LOG_LVL,
     format=LOG_FORMAT,
 )
-app = FastAPI()
+app = FastAPI(
+    title="Film catalog",
+    lifespan=lifespan,
+)
 
 app.include_router(api_v1_router)
 
