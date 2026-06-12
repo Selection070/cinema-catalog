@@ -54,12 +54,10 @@ class FilmStorage(BaseModel):
             **new_film.model_dump(),
         )
         self.slug_to_films[created_film.slug] = created_film
-        self.save_state()
         return created_film
 
     def delete_by_slug(self, slug: str) -> None:
         self.slug_to_films.pop(slug, None)
-        self.save_state()
 
     def delete(self, film: Film) -> None:
         self.delete_by_slug(slug=film.slug)
@@ -67,7 +65,6 @@ class FilmStorage(BaseModel):
     def update(self, film: Film, film_in: FilmUpdate) -> Film:
         for field_name, value in film_in:
             setattr(film, field_name, value)
-        self.save_state()
         return film
 
     def update_partial(
@@ -77,7 +74,6 @@ class FilmStorage(BaseModel):
     ) -> Film:
         for field_name, value in film_in.model_dump(exclude_unset=True).items():
             setattr(film, field_name, value)
-        self.save_state()
         return film
 
 

@@ -1,6 +1,7 @@
 from fastapi import (
     APIRouter,
     status,
+    BackgroundTasks,
 )
 
 from api.api_v1.films.crud import storage
@@ -35,5 +36,7 @@ async def get_films() -> dict[str, list[Film]]:
 )
 async def create(
     new_film: FilmCreate,
+    background_tasks: BackgroundTasks,
 ) -> Film:
+    background_tasks.add_task(storage.save_state)
     return storage.create_film(new_film)
