@@ -70,6 +70,16 @@ def save_storage_state(
         background_tasks.add_task(storage.save_state)
 
 
+def validate_api_token(
+    api_token: HTTPAuthorizationCredentials | None,
+):
+    if api_token and api_token.credentials not in API_TOKENS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token {api_token!r} is invalid",
+        )
+
+
 def api_token_required(
     request: Request,
     api_token: Annotated[
@@ -86,11 +96,24 @@ def api_token_required(
             detail=f"API Token is not found",
         )
 
-    if api_token.credentials not in API_TOKENS:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token {api_token!r} is invalid",
-        )
+    validate_api_token(api_token=api_token)
+
+
+def validate_basic_auth(
+    credentials: HTTPBasicCredentials | None,
+):
+    if (
+        credentials
+        and credentials.username in USERS
+        and USERS[credentials.username] == credentials.password
+    ):
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid username or password",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 
 def users_auth_required(
@@ -101,15 +124,31 @@ def users_auth_required(
     if request.method not in UNSAFE_METHODS:
         return
 
-    if (
-        credentials
-        and credentials.username in USERS
-        and USERS[credentials.username] == credentials.password
-    ):
+    validate_basic_auth(credentials=credentials)
+
+
+def api_token_or_user_aut(
+    request: Request,
+    api_token: Annotated[
+        HTTPAuthorizationCredentials | None,
+        Depends(static_api_token),
+    ] = None,
+    credentials: Annotated[
+        HTTPBasicCredentials | None,
+        Depends(user_basic_auth),
+    ] = None,
+):
+    if request.method not in UNSAFE_METHODS:
         return
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=f"Authentication credentials were not provided",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    if credentials:
+        validate_basic_auth(credentials=credentials)
+
+    if api_token:
+        validate_api_token(api_token=api_token)
+
+    if not (api_token or credentials):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Api token or basic auth required",
+        )
