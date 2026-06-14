@@ -3,13 +3,23 @@ import logging
 from fastapi import (
     HTTPException,
     BackgroundTasks,
+    Request,
+    status,
 )
-from starlette import status
 
 from api.api_v1.films.crud import storage
 from schemas.films import Film
 
 log = logging.getLogger(__name__)
+
+UNSAFE_METHODS = frozenset(
+    [
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+    ]
+)
 
 
 async def get_film_by_slug(slug: str) -> Film:
@@ -24,7 +34,9 @@ async def get_film_by_slug(slug: str) -> Film:
 
 
 def save_storage_state(
+    request: Request,
     background_tasks: BackgroundTasks,
 ):
-    log.info("Add bg task to save the storage")
-    background_tasks.add_task(storage.save_state)
+    if request.method in UNSAFE_METHODS:
+        log.info("Add bg task to save the storage")
+        background_tasks.add_task(storage.save_state)
