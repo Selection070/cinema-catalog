@@ -50,7 +50,7 @@ def save_storage_state(
 
 def api_token_required(
     request: Request,
-    api_token: Annotated[str, Header()] = "",
+    api_token: Annotated[str, Header(alias="x-auth-token")] = "",
 ):
     if request.method not in UNSAFE_METHODS:
         return
