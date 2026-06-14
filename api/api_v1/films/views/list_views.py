@@ -1,13 +1,15 @@
 from fastapi import (
     APIRouter,
     status,
-    BackgroundTasks,
     Depends,
 )
 
 from api.api_v1.films.crud import storage
 
-from api.api_v1.films.dependencies import save_storage_state
+from api.api_v1.films.dependencies import (
+    save_storage_state,
+    api_token_required,
+)
 
 from schemas.films import (
     Film,
@@ -18,7 +20,10 @@ from schemas.films import (
 router = APIRouter(
     prefix="/films",
     tags=["films"],
-    dependencies=[Depends(save_storage_state)],
+    dependencies=[
+        Depends(save_storage_state),
+        Depends(api_token_required),
+    ],
 )
 
 
