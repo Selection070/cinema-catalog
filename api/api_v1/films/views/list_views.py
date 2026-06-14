@@ -27,9 +27,13 @@ router = APIRouter(
     responses={
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Unauthorized. Only for unsafe methods",
-            "content": {"application/json": {"example": {
-                "detail": "Invalid API Token",
-            }}},
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Invalid API Token",
+                    }
+                }
+            },
         }
     },
 )
