@@ -2,9 +2,12 @@ from fastapi import (
     APIRouter,
     status,
     BackgroundTasks,
+    Depends,
 )
 
 from api.api_v1.films.crud import storage
+
+from api.api_v1.films.dependencies import save_storage_state
 
 from schemas.films import (
     Film,
@@ -15,6 +18,7 @@ from schemas.films import (
 router = APIRouter(
     prefix="/films",
     tags=["films"],
+    dependencies=[Depends(save_storage_state)],
 )
 
 
@@ -36,7 +40,5 @@ async def get_films() -> dict[str, list[Film]]:
 )
 async def create(
     new_film: FilmCreate,
-    background_tasks: BackgroundTasks,
 ) -> Film:
-    background_tasks.add_task(storage.save_state)
     return storage.create_film(new_film)
