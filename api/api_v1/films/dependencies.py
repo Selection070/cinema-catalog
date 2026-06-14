@@ -52,9 +52,10 @@ def api_token_required(
     request: Request,
     api_token: Annotated[str, Query()] = "",
 ):
-    if request.method in UNSAFE_METHODS:
-        if api_token not in API_TOKENS:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Token {api_token!r} is invalid",
-            )
+    if request.method not in UNSAFE_METHODS:
+        return
+    if api_token not in API_TOKENS:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token {api_token!r} is invalid",
+        )
