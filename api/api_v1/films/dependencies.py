@@ -7,7 +7,7 @@ from fastapi import (
     BackgroundTasks,
     Request,
     status,
-    Query,
+    Header,
 )
 
 from api.api_v1.films.crud import storage
@@ -50,7 +50,7 @@ def save_storage_state(
 
 def api_token_required(
     request: Request,
-    api_token: Annotated[str, Query()] = "",
+    api_token: Annotated[str, Header()] = "",
 ):
     if request.method not in UNSAFE_METHODS:
         return
