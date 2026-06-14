@@ -13,11 +13,16 @@ from fastapi import (
 from fastapi.security import (
     HTTPAuthorizationCredentials,
     HTTPBearer,
+    HTTPBasic,
+    HTTPBasicCredentials,
 )
 
 from api.api_v1.films.crud import storage
 
-from core.config import API_TOKENS
+from core.config import (
+    API_TOKENS,
+    USERS,
+)
 
 from schemas.films import Film
 
@@ -35,6 +40,12 @@ UNSAFE_METHODS = frozenset(
 static_api_token = HTTPBearer(
     scheme_name="API Token",
     description="API token for **authentication**. [Read more](#)",
+    auto_error=False,
+)
+
+user_basic_auth = HTTPBasic(
+    scheme_name="Basic Auth",
+    description="Basic auth for **authentication**. [Read more](#)",
     auto_error=False,
 )
 
@@ -80,3 +91,25 @@ def api_token_required(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Token {api_token!r} is invalid",
         )
+
+
+def users_auth_required(
+    request: Request,
+    credentials: Annotated[HTTPBasicCredentials, Depends(user_basic_auth)],
+):
+
+    if request.method not in UNSAFE_METHODS:
+        return
+
+    if (
+        credentials
+        and credentials.username in USERS
+        and USERS[credentials.username] == credentials.password
+    ):
+        return
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=f"Authentication credentials were not provided",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
