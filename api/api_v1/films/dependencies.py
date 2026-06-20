@@ -62,15 +62,6 @@ async def get_film_by_slug(slug: str) -> Film:
     )
 
 
-def save_storage_state(
-    request: Request,
-    background_tasks: BackgroundTasks,
-):
-    if request.method in UNSAFE_METHODS:
-        log.info("Add bg task to save the storage")
-        background_tasks.add_task(storage.save_state)
-
-
 def validate_api_token(
     api_token: HTTPAuthorizationCredentials,
 ):

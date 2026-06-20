@@ -7,7 +7,6 @@ from fastapi import (
 from api.api_v1.films.crud import storage
 
 from api.api_v1.films.dependencies import (
-    save_storage_state,
     api_token_or_user_aut,
 )
 
@@ -21,7 +20,6 @@ router = APIRouter(
     prefix="/films",
     tags=["films"],
     dependencies=[
-        Depends(save_storage_state),
         Depends(api_token_or_user_aut),
     ],
     responses={
