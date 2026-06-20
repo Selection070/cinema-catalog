@@ -12,8 +12,11 @@ class RedisTokensHelper(AbstractTokensHelper):
         self.redis = Redis(host=host, port=port, db=db, decode_responses=True)
         self.tokens_set_name = tokens_set_name
 
-    def get_tokens(self) -> set[bytes | str]:
-        return self.redis.smembers(self.tokens_set_name)
+    def get_tokens(self) -> list[str]:
+        return list(self.redis.smembers(self.tokens_set_name))
+
+    def delete_token(self, token: str) -> None:
+        self.redis.srem(self.tokens_set_name, token)
 
     def check_token(self, token: str) -> bool:
         return bool(self.redis.sismember(self.tokens_set_name, token))

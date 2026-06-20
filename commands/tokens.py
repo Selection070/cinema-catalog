@@ -39,3 +39,9 @@ def check(
 @app.command(help="Check exist token")
 def get_tokens() -> None:
     print("Tokens [bold]exist[/bold]:", *redis_token.get_tokens())
+
+
+@app.command(help="Delete token")
+def delete_token(token: str) -> None:
+    redis_token.delete_token(token)
+    print(f"Token [bold]{token!r}[/bold] has [red]deleted[/red].")

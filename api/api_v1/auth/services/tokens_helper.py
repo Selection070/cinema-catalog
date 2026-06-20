@@ -15,6 +15,14 @@ class AbstractTokensHelper(ABC):
         """
 
     @abstractmethod
+    def delete_token(self, token: str) -> None:
+        """
+        Delete token from storage
+        :param token:
+        :return:
+        """
+
+    @abstractmethod
     def check_token(self, token: str) -> bool:
         """
         Check is token exists
