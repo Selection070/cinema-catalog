@@ -9,6 +9,12 @@ class AbstractTokensHelper(ABC):
     """
 
     @abstractmethod
+    def get_tokens(self) -> list[str]:
+        """
+        Get all tokens
+        """
+
+    @abstractmethod
     def check_token(self, token: str) -> bool:
         """
         Check is token exists

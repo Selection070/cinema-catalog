@@ -34,3 +34,8 @@ def check(
             else "[red]not exist[/red]."
         ),
     )
+
+
+@app.command(help="Check exist token")
+def get_tokens() -> None:
+    print("Tokens [bold]exist[/bold]:", *redis_token.get_tokens())
