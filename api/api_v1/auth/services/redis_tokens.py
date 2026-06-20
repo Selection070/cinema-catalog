@@ -12,8 +12,8 @@ class RedisTokensHelper(AbstractTokensHelper):
         self.redis = Redis(host=host, port=port, db=db, decode_responses=True)
         self.tokens_set_name = tokens_set_name
 
-    def get_tokens(self) -> list[str]:
-        return list(self.redis.smembers(self.tokens_set_name))
+    def get_tokens(self):
+        return self.redis.smembers(self.tokens_set_name)
 
     def delete_token(self, token: str) -> None:
         self.redis.srem(self.tokens_set_name, token)
@@ -28,8 +28,12 @@ class RedisTokensHelper(AbstractTokensHelper):
     def generate_token(cls) -> str:
         return secrets.token_urlsafe(16)
 
-    def add_token(self, token: str) -> None:
+    def create_token(self) -> str:
         token = self.generate_token()
+        self.redis.sadd(self.tokens_set_name, token)
+        return token
+
+    def add_token(self, token: str) -> None:
         self.save_token(token)
 
 

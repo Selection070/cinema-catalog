@@ -45,3 +45,15 @@ def get_tokens() -> None:
 def delete_token(token: str) -> None:
     redis_token.delete_token(token)
     print(f"Token [bold]{token!r}[/bold] has [red]deleted[/red].")
+
+
+@app.command(help="Add token to storage")
+def add_token(token: str) -> None:
+    redis_token.add_token(token)
+    print(f"Token [bold green]{token}[/bold green] has [green]added[/green].")
+
+
+@app.command(help="Generate and add token to storage")
+def generate() -> None:
+    token = redis_token.create_token()
+    print(f"Token [bold green]{token}[/bold green] has [green]added[/green].")
