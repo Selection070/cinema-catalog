@@ -24,9 +24,6 @@ from api.api_v1.auth.services import (
     redis_user,
 )
 
-from core.config import (
-    REDIS_TOKENS_KEYS_NAME,
-)
 
 from schemas.films import Film
 
