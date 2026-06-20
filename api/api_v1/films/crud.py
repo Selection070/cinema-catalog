@@ -4,7 +4,6 @@ from redis import Redis
 
 from pydantic import (
     BaseModel,
-    ValidationError,
 )
 
 from schemas.films import (
