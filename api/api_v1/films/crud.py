@@ -52,6 +52,13 @@ class FilmStorage(BaseModel):
         )
         log.warning("Recovered data from storage")
 
+    def save_film_to_storage(self, film: Film) -> None:
+        redis.hset(
+            config.REDIS_APP_HASH_NAME,
+            film.slug,
+            film.model_dump_json(),
+        )
+
     def get(self) -> list[Film]:
         films = redis.hvals(config.REDIS_APP_HASH_NAME)
         return list(map(Film.model_validate_json, films))
@@ -61,12 +68,8 @@ class FilmStorage(BaseModel):
             return Film.model_validate_json(film)
 
     def create_film(self, new_film: FilmCreate) -> Film:
-        redis.hset(
-            config.REDIS_APP_HASH_NAME,
-            new_film.slug,
-            new_film.model_dump_json(),
-        )
-        return new_film.model_dump()
+        self.save_film_to_storage(Film(**new_film.model_dump()))
+        return Film(**new_film.model_dump())
 
     def delete_by_slug(self, slug: str) -> None:
         self.slug_to_films.pop(slug, None)
@@ -77,6 +80,7 @@ class FilmStorage(BaseModel):
     def update(self, film: Film, film_in: FilmUpdate) -> Film:
         for field_name, value in film_in:
             setattr(film, field_name, value)
+        self.save_film_to_storage(film)
         return film
 
     def update_partial(
@@ -86,6 +90,7 @@ class FilmStorage(BaseModel):
     ) -> Film:
         for field_name, value in film_in.model_dump(exclude_unset=True).items():
             setattr(film, field_name, value)
+        self.save_film_to_storage(film)
         return film
 
 
