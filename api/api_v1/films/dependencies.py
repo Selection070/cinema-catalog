@@ -19,7 +19,10 @@ from fastapi.security import (
 
 from api.api_v1.films.crud import storage
 
-from redis_t import redis_token
+from api.api_v1.auth.services import (
+    redis_token,
+    redis_user,
+)
 
 from core.config import (
     REDIS_TOKENS_KEYS_NAME,
@@ -103,13 +106,13 @@ def api_token_required(
 
 
 def validate_basic_auth(
-    credentials: HTTPBasicCredentials | None,
-):
-    if (
-        credentials
-        and credentials.username in USERS
-        and USERS[credentials.username] == credentials.password
-    ):
+    credentials: HTTPBasicCredentials,
+) -> None:
+    user = redis_user.validate_user_password(
+        username=credentials.username,
+        password=credentials.password,
+    )
+    if user:
         return
 
     raise HTTPException(
