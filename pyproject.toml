@@ -8,5 +8,6 @@ dependencies = [
     "mypy>=1.11",
     "python-multipart>=0.0.20",
     "redis[hiredis]>=7.0.1",
+    "typer>=0.23.2",
     "uvicorn>=0.39.0",
 ]
