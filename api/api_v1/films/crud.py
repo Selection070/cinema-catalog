@@ -53,15 +53,11 @@ class FilmStorage(BaseModel):
         log.warning("Recovered data from storage")
 
     def get(self) -> list[Film]:
-        films = redis.hgetall(config.REDIS_APP_HASH_NAME)
-        list_films = list(
-            Film.model_validate_json(value) for keys, value in films.items()
-        )
-        return list_films
+        films = redis.hvals(config.REDIS_APP_HASH_NAME)
+        return list(map(Film.model_validate_json, films))
 
     def get_film_by_slug(self, slug: str) -> Film | None:
-        film = redis.hget(config.REDIS_APP_HASH_NAME, slug)
-        if film is not None:
+        if film := redis.hget(config.REDIS_APP_HASH_NAME, slug):
             return Film.model_validate_json(film)
 
     def create_film(self, new_film: FilmCreate) -> Film:
