@@ -25,6 +25,18 @@ redis = Redis(
 )
 
 
+class FilmBaseError(Exception):
+    """
+    Base exception for all exceptions raised by this module
+    """
+
+
+class FilmCreateError(FilmBaseError):
+    """
+    Raised when try to create film if film exist
+    """
+
+
 class FilmStorage(BaseModel):
 
     def save_film_to_storage(self, film: Film) -> None:
@@ -42,9 +54,18 @@ class FilmStorage(BaseModel):
         if film := redis.hget(config.REDIS_APP_HASH_NAME, slug):
             return Film.model_validate_json(film)
 
+    def is_exist(self, slug: str) -> bool:
+        return redis.hexists(name=config.REDIS_APP_HASH_NAME, key=slug)
+
     def create_film(self, new_film: FilmCreate) -> Film:
         self.save_film_to_storage(Film(**new_film.model_dump()))
         return Film(**new_film.model_dump())
+
+    def create_or_raise_exist(self, film: FilmCreate) -> Film:
+        if not self.is_exist(slug=film.slug):
+            return self.create_film(film)
+
+        raise FilmCreateError(film.slug)
 
     def delete_by_slug(self, slug: str) -> None:
         redis.hdel(config.REDIS_APP_HASH_NAME, slug)
