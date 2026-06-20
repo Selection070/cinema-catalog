@@ -1,5 +1,7 @@
 import logging
 
+from redis import Redis
+
 from pydantic import (
     BaseModel,
     ValidationError,
@@ -12,24 +14,31 @@ from schemas.films import (
     FilmUpdatePartial,
 )
 
-from core.config import FILMS_STORAGE_FILEPATH
+from core import config
 
 log = logging.getLogger(__name__)
+
+redis = Redis(
+    host=config.REDIS_HOST,
+    port=config.REDIS_PORT,
+    db=config.REDIS_APP_DB,
+    decode_responses=True,
+)
 
 
 class FilmStorage(BaseModel):
     slug_to_films: dict[str, Film] = {}
 
     def save_state(self) -> None:
-        FILMS_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
+        config.FILMS_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
         log.info("Saved short urls storage file.")
 
     @classmethod
     def from_state(cls) -> "FilmStorage":
-        if not FILMS_STORAGE_FILEPATH.exists():
+        if not config.FILMS_STORAGE_FILEPATH.exists():
             log.info("Short urls storage file not found.")
             return FilmStorage()
-        return cls.model_validate_json(FILMS_STORAGE_FILEPATH.read_text())
+        return cls.model_validate_json(config.FILMS_STORAGE_FILEPATH.read_text())
 
     def initial_from_storage(self) -> None:
         try:
@@ -50,11 +59,12 @@ class FilmStorage(BaseModel):
         return self.slug_to_films.get(slug)
 
     def create_film(self, new_film: FilmCreate) -> Film:
-        created_film = Film(
-            **new_film.model_dump(),
+        redis.hset(
+            config.REDIS_APP_HASH_NAME,
+            new_film.slug,
+            new_film.model_dump_json(),
         )
-        self.slug_to_films[created_film.slug] = created_film
-        return created_film
+        return new_film.model_dump()
 
     def delete_by_slug(self, slug: str) -> None:
         self.slug_to_films.pop(slug, None)
